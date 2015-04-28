@@ -1,13 +1,30 @@
 application: hamtrainer
-version: 1.0b1
+version: alpha
 runtime: go
 api_version: go1
 
 handlers:
-- url: /static
-  static_dir: static
+- url: /images
+  static_dir: static/images
+  secure: always
+
+- url: /js
+  static_dir: static/js
+  secure: always
+
+- url: /css
+  static_dir: static/css
+  secure: always
+
+- url: /partials
+  static_dir: static/partials
+  secure: always
+
+- url: /api/.*
+  script: _go_app
   secure: always
 
 - url: /.*
-  script: _go_app
+  static_files: static/index.html
   secure: always
+  upload: static/index.html

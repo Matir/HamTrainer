@@ -31,7 +31,7 @@ type QuestionPool struct {
 var questionPools map[string]*QuestionPool = make(map[string]*QuestionPool)
 
 // Base path for json files
-var jsonBase = "."
+var jsonBase = "data/json"
 
 // Get data for the question pool specified by Pool
 func GetPool(class string) (*QuestionPool, error) {
