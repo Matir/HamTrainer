@@ -120,10 +120,12 @@ class PoolParse(object):
                     'correct': item.group('correct'),
                     'citation': item.group('citation'),
                     'question': item.group('question'),
-                    'A': item.group('a'),
-                    'B': item.group('b'),
-                    'C': item.group('c'),
-                    'D': item.group('d'),
+                    'answers': {
+                        'A': item.group('a'),
+                        'B': item.group('b'),
+                        'C': item.group('c'),
+                        'D': item.group('d'),
+                    },
                 }
                 results[key] = qdata
             if self.verbose:
@@ -178,7 +180,7 @@ def find_missing_qs(pool):
             }
     all_questions = set()
     for topic, num in known.iteritems():
-        for q in xrange(1, num+1):
+        for q in xrange(1, num + 1):
             all_questions.add('%s%02d' % (topic, q))
 
     return all_questions - set(pool.find_questions().keys())
