@@ -5,11 +5,17 @@ import (
 	"fmt"
 	"app/logging"
 	"net/http"
+	"github.com/gorilla/mux"
 )
 
 func init() {
 	SetCSRFKey("TODO_load_key_from_models")
-	http.HandleFunc("/api/ok", ok)
+
+	// Setup handlers
+	r := mux.NewRouter()
+	r.HandleFunc("/api/ok", ok)
+	r.HandleFunc("/api/pool/{class}", poolHandler)
+	http.Handle("/", r)
 }
 
 // Sanity test handler
