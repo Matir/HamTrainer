@@ -8,14 +8,14 @@ import (
 	"appengine/user"
 )
 
-// Returns current username, or nil if none
+// Returns current username, or empty string if none
 func getUserEmail(r *http.Request) (string, error) {
 	c := appengine.NewContext(r)
 	u := user.Current(c)
 	if u == nil {
-		return nil
+		return "", fmt.Errorf("No user found.")
 	}
-	return u.Email
+	return u.Email, nil
 }
 
 // Get a login URL
@@ -29,14 +29,18 @@ func getLoginURL(r *http.Request) (string, error) {
 // Check if current user is an admin
 func isAdmin(r *http.Request) bool {
 	c := appengine.NewContext(r)
-	return c.IsAdmin()
+	return user.IsAdmin(c)
 }
 
 // Wrapper function to require a logged-in user.
 func authRequired(f http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if _, err := getUserEmail(r); err != nil {
-			loginURL := getLoginURL(r)
+			loginURL, err := getLoginURL(r)
+			if err != nil {
+				http.Error(w, "Access Denied", 403)
+				return
+			}
 			http.Redirect(w, r, loginURL, http.StatusFound)
 			return
 		}
@@ -44,18 +48,13 @@ func authRequired(f http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// Wrapper function for CSRF protection.
-func csrfRequired(f http.HandlerFunc) http.HandlerFunc {
-	// TODO: implement
-	return f
-}
-
 // Wrapper function for admin required.
 func adminRequired(f http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// TODO: redirect or good error
-		if isAdmin(r) {
-			f(w, r)
+		if !isAdmin(r) {
+			http.Error(w, "Access Denied", 403)
+			return
 		}
+		f(w, r)
 	}
 }
