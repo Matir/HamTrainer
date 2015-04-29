@@ -8,6 +8,7 @@ import (
 )
 
 func init() {
+	SetCSRFKey("TODO_load_key_from_models")
 	http.HandleFunc("/api/ok", ok)
 }
 

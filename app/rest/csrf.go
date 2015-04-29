@@ -12,10 +12,14 @@ import (
 )
 
 var tokenDuration time.Duration = 12 * time.Hour
+var csrfKey string
 
 func getCSRFKey() []byte {
-	// TODO: fix
-	return []byte("dummykey")
+	return []byte(csrfKey)
+}
+
+func SetCSRFKey(key string) {
+	csrfKey = key
 }
 
 func makeCSRFToken(username string, expiration time.Time) string {
@@ -74,7 +78,7 @@ func ValidateCSRFToken(r *http.Request) bool {
 		return false
 	}
 
-	expiration := time.Time.Unix(expiration_ts, 0)
+	expiration := time.Unix(expiration_ts, 0)
 	if expiration.Before(time.Now().UTC()) {
 		// Expired token
 		return false
@@ -86,7 +90,7 @@ func ValidateCSRFToken(r *http.Request) bool {
 
 func csrfRequired(f http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
+		if r.Method == "GET" || r.Method == "HEAD" {
 			f(w ,r)
 			return
 		}
